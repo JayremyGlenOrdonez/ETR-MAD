@@ -1,18 +1,18 @@
-import 'package:etrmad/BottomButtons/home_screen.dart';
+import 'package:etrmad/_screen_controls.dart';
 import 'package:flutter/material.dart';
 
-void main(){
-  runApp(EtrMad());
+void main() {
+  runApp(const EtrMad());
 }
 
 class EtrMad extends StatelessWidget {
-   EtrMad({super.key});
+  const EtrMad({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: ScreenControls(),
     );
   }
 }
