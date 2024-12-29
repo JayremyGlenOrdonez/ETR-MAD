@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:etrmad/models/borrowed_item.dart';
@@ -6,7 +5,6 @@ import 'package:etrmad/models/event_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../models/item_model.dart';
 
 class DbHelper {
   static Database? _db;

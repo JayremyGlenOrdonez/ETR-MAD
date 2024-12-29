@@ -43,7 +43,6 @@ class _ScreenControlsState extends State<ScreenControls> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: drawer(),
       appBar: appBar(),
       body: bodyScreen(),
       bottomNavigationBar: bottomNavigationBar(),
@@ -52,52 +51,6 @@ class _ScreenControlsState extends State<ScreenControls> {
 
   //
   // DRAWER
-  Drawer drawer() {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: const Color(0xFF85E9FF).withOpacity(0.3),
-            ),
-            child: Align(
-              alignment: Alignment.center,
-              child: ShaderMask(
-                shaderCallback: (Rect bounds) {
-                  return const LinearGradient(
-                    colors: [
-                      primaryColor,
-                      secondaryColor,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ).createShader(bounds);
-                },
-                child: Text(
-                  mainTitle.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                    fontFamily: fontFamily,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    );
-  }
 
 //
   // APP BAR
