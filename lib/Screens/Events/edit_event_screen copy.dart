@@ -17,17 +17,54 @@ import '../../Database/db_helper.dart';
 import '../../models/event_model.dart';
 import '../../services/notification_helper.dart';
 
-class CreateEventScreen extends StatefulWidget {
-  const CreateEventScreen({super.key});
-
+class EditEventScreen extends StatefulWidget {
+  EditEventScreen({super.key, required this.event});
+  Event event;
   @override
-  State<CreateEventScreen> createState() => _CreateEventScreenState();
+  State<EditEventScreen> createState() => _EditEventScreenState();
 }
 
-class _CreateEventScreenState extends State<CreateEventScreen> {
+class _EditEventScreenState extends State<EditEventScreen> {
   var controller = Get.find<EventController>();
 
+  @override
+  void initState() {
+    super.initState();
+
+    eventNameController.text = widget.event.name;
+    eventVenueController.text = widget.event.venue ?? "";
+    eventDescriptionController.text = widget.event.description ?? "";
+    selectedDateTime = widget.event.dateTime;
+    packingDatetime = widget.event.packingDatetime;
+    retrieveDatetime = widget.event.retrieveDatetime;
+
+    items = widget.event.items;
+
+    //
+    if (widget.event.image != null) {
+      imageFile = widget.event.image!;
+    }
+    if (widget.event.isPackingReminder || widget.event.isRetrieveReminder) {
+      isReminder = true;
+      isPackingReminder = widget.event.isPackingReminder;
+      isRetrieveReminder = widget.event.isRetrieveReminder;
+    }
+
+    //
+
+    //December 5, 2023 | 5:00 PM
+    eventDateTimeController.text =
+        DateFormat('MMMM d, yyyy | h:mm a').format(selectedDateTime!);
+    eventPackingDateTimeController.text = packingDatetime == null
+        ? ""
+        : DateFormat('MMMM d, yyyy | h:mm a').format(packingDatetime!);
+    eventRetrieveDateTimeController.text = retrieveDatetime == null
+        ? ""
+        : DateFormat('MMMM d, yyyy | h:mm a').format(retrieveDatetime!);
+  }
+
   //
+
   Size size = const Size(0, 0);
 
   File? imageFile;
@@ -82,7 +119,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ).createShader(bounds);
           },
           child: const Text(
-            'Create Event',
+            'Edit Event',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w300,
@@ -155,27 +192,24 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               log(eventDateTime.toString());
 
               Event event = Event(
+                id: widget.event.id,
                 name: eventNameController.text,
                 venue: eventVenueController.text,
                 description: eventDescriptionController.text,
-                dateTime: selectedDateTime!,
+                dateTime: widget.event.dateTime,
                 packingDatetime: packingDatetime,
                 retrieveDatetime: retrieveDatetime,
                 isPackingReminder: isPackingReminder,
                 isRetrieveReminder: isRetrieveReminder,
                 image: imageFile,
-                status: 'Upcoming',
+                status: widget.event.status,
                 items: items,
               );
 
               // //
-              var eventAdded = await database.insertEvent(event);
+              var eventAdded = await database.updateEvent(event);
 
               if (eventAdded.id == 0) {
-                showDialog(
-                    context: context,
-                    builder: (context) =>
-                        failedDialog(context, message: 'Failed to add event'));
                 return;
               }
 
@@ -296,6 +330,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 },
                 controller: eventDateTimeController,
                 label: 'Event Date & Time',
+                readOnly: true,
                 onTap: () => pickEventDateTime(context),
               ),
 
@@ -372,6 +407,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           name: itemsController.text,
                           quantity:
                               int.parse(itemQuantityController.text.trim()),
+                          isReturned: false,
                         ));
                         itemsController.clear();
                         itemQuantityController.clear();

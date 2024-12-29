@@ -4,8 +4,12 @@ import 'dart:developer';
 import 'package:etrmad/Database/db_helper.dart';
 import 'package:etrmad/Screens/Events/create_event_screen.dart';
 import 'package:etrmad/Screens/Events/event_view.dart';
+import 'package:etrmad/Screens/Items/add_borrowed_item_screen.dart';
+import 'package:etrmad/Screens/Items/borrowed_item_view.dart';
 import 'package:etrmad/constant/global.dart';
+import 'package:etrmad/controller/borrow_controller.dart';
 import 'package:etrmad/controller/event_controller.dart';
+import 'package:etrmad/models/borrowed_item.dart';
 import 'package:etrmad/models/event_model.dart';
 import 'package:etrmad/utils/custom_tools.dart';
 import 'package:flutter/material.dart';
@@ -15,22 +19,22 @@ import '../../Styles/custom_colors.dart';
 import '../../services/notification_helper.dart';
 import '../../utils/widgets.dart'; // Ensure this import is added for MenuScreen
 
-class EventScreen extends StatefulWidget {
-  const EventScreen({super.key});
+class BorrowedItemScreen extends StatefulWidget {
+  const BorrowedItemScreen({super.key});
 
   @override
-  State<EventScreen> createState() => _EventScreenState();
+  State<BorrowedItemScreen> createState() => _BorrowedItemScreenState();
 }
 
-class _EventScreenState extends State<EventScreen> {
-  var eventController = Get.put(EventController());
-
+class _BorrowedItemScreenState extends State<BorrowedItemScreen> {
   //
+  var controller = Get.put(BorrowController());
 
   String status = 'All';
 
   @override
   Widget build(BuildContext context) {
+    //
     Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Column(
@@ -38,14 +42,14 @@ class _EventScreenState extends State<EventScreen> {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              addEventButtonIcon(
+              addBorrowedButtonIcon(
                 context,
                 onTap: () {
-                  gotoScreen(context, screen: const CreateEventScreen());
+                  gotoScreen(context, screen: const AddBorrowedItemScreen());
                 },
               ),
               gap(height: 16.0),
-              eventsDropDownButton(context, onSelected: (value) {
+              borrowedItemsDropDownButton(context, onSelected: (value) {
                 setState(() {
                   status = value!;
                 });
@@ -54,24 +58,22 @@ class _EventScreenState extends State<EventScreen> {
           ),
           gap(height: 10.0),
           Obx(() {
-            List<Event> events = [];
+            List<BorrowedItem> items = [];
             if (status == 'All') {
-              events = EVENTLIST.value;
-            } else if (status == 'Upcoming') {
-              events = UPCOMING_EVENTLIST.value;
-            } else if (status == 'Current') {
-              events = CURRENT_EVENTLIST.value;
-            } else if (status == 'Ended') {
-              events = ENDED_EVENTLIST.value;
+              items = BORROWEDLIST.value;
+            } else if (status == 'Pending') {
+              items = PENDING_BORROWEDLIST.value;
+            } else if (status == 'Returned') {
+              items = RETURNED_BORROWEDLIST.value;
             }
 
-            if (events.isEmpty) {
+            if (items.isEmpty) {
               return SizedBox(
                 width: size.width,
                 height: size.height * 0.54,
                 child: const Center(
                   child: Text(
-                    'No events found',
+                    'No item found',
                     style: TextStyle(
                       fontSize: 14,
                       color: labelColor,
@@ -85,7 +87,7 @@ class _EventScreenState extends State<EventScreen> {
             return SizedBox(
               width: size.width,
               height: size.height * 0.54,
-              child: listOfEvents(events: events),
+              child: liftOfBorrowedItems(items: items),
             );
           }),
         ],
@@ -93,13 +95,13 @@ class _EventScreenState extends State<EventScreen> {
     );
   }
 
-  Widget listOfEvents({required List<Event> events}) {
+  Widget liftOfBorrowedItems({required List<BorrowedItem> items}) {
     return ListView.builder(
-      itemCount: events.length,
+      itemCount: items.length,
       shrinkWrap: true,
       itemBuilder: (context, index) {
         return Dismissible(
-          key: Key(events[index].id.toString()),
+          key: Key(items[index].id.toString()),
           direction: DismissDirection.endToStart,
           confirmDismiss: (direction) async {
             if (direction == DismissDirection.endToStart) {
@@ -108,10 +110,10 @@ class _EventScreenState extends State<EventScreen> {
                 builder: (context) => deleteEventModal(
                   context,
                   onDelete: () async {
-                    await DbHelper.instance.deleteEvent(events[index].id);
+                    await DbHelper.instance.deleteBorrowedItem(items[index].id);
                     setState(() {
                       Navigator.of(context).pop();
-                      eventController.refresh();
+                      controller.refresh();
                     });
                   },
                 ),
@@ -132,15 +134,14 @@ class _EventScreenState extends State<EventScreen> {
             onTap: () {
               gotoScreen(
                 context,
-                screen: EventViewScreen(event: events[index]),
+                screen: ItemViewScreen(borrowedItem: items[index]),
               );
             },
-            child: eventCard(
+            child: borrowedCard(
               context,
-              title: events[index].name,
-              status: events[index].status,
-              image: events[index].image,
-              items: events[index].items.length,
+              name: items[index].title,
+              status: items[index].status,
+              quantity: items[index].items.length,
             ),
           ),
         );

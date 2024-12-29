@@ -1,7 +1,16 @@
 import 'package:etrmad/_screen_controls.dart';
+import 'package:etrmad/services/notification_helper.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Manila'));
+
+  await NotificationHelper.init();
   runApp(const EtrMad());
 }
 

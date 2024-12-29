@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../Styles/custom_colors.dart';
 
@@ -26,6 +29,13 @@ void gotoScreen(BuildContext context, {required Widget screen}) {
   );
 }
 
+void gotoScreenReplacement(BuildContext context, {required Widget screen}) {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => screen),
+  );
+}
+
 // Date Picker
 Future<DateTime?> pickDate(BuildContext context,
     {DateTime? initialDate}) async {
@@ -44,4 +54,17 @@ Future<TimeOfDay?> pickTime(BuildContext context,
     context: context,
     initialTime: initialTime ?? TimeOfDay.now(),
   );
+}
+
+Future<File?> pickImage(ImageSource source) async {
+  final ImagePicker picker = ImagePicker();
+  try {
+    final XFile? pickedFile = await picker.pickImage(source: source);
+    if (pickedFile != null) {
+      return File(pickedFile.path);
+    }
+  } catch (e) {
+    print("Error picking image: $e");
+  }
+  return null;
 }
