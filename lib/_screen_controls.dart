@@ -6,10 +6,11 @@ import 'package:etrmad/Styles/custom_colors.dart';
 import 'package:etrmad/Screens/Items/borrowed_items_screen.dart';
 import 'package:etrmad/Screens/Events/event_screen.dart';
 import 'package:etrmad/Styles/titles.dart';
-import 'package:etrmad/constant/global.dart';
+
 import 'package:etrmad/models/event_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import 'Styles/fonts.dart';
 import 'Screens/Home/home_screen.dart';
@@ -148,10 +149,9 @@ class _ScreenControlsState extends State<ScreenControls> {
             event.dateTime.minute);
 
         // Get the current time, ignoring milliseconds
-        DateTime now = DateTime.now().millisecondsSinceEpoch < 1000
-            ? DateTime.now()
-                .subtract(Duration(milliseconds: DateTime.now().millisecond))
-            : DateTime.now();
+        var formattedDateTime =
+            DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
+        DateTime now = DateTime.parse(formattedDateTime);
 
         // Print for debugging
         // print("Full Event DateTime: $fullEventDateTime");
